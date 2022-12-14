@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<link rel="stylesheet" type="text/css" href="../style.css" />
+		<link rel="stylesheet" type="text/css" href="../print.css" media="print" />
+		<script type="text/javascript" src="../labs.js"></script>
+		
+		<style type="text/css">
+			#netterms {
+				line-height: 2em;
+			}
+			
+			#netterms li {
+				display: inline;
+				padding: 0.2em 0.5em;
+				border-left: thin dotted gray;
+				border-right: thin dotted gray;
+			}
+			
+			.sectionheader {
+				margin-top: 14em;
+			}
+		</style>
+
+		<style type="text/css" media="print">
+			h2 {
+				margin-top: 1em !important;
+				padding-top: 0em !important;
+			}
+		</style>
+
+		<title>CMSC 121 Internet Technologies Activity 7 (DOM / Events)</title>
+	</head>
+
+	<body>
+		<h1>
+			CMSC 121 Internet Technologies <br />
+			Activity 7: JavaScript DOM and Events
+		</h1>
+		<h1>
+			From: <br />
+			Web Programming Step by Step <br />
+			Lab 6: JavaScript DOM and Events
+		</h1>
+
+		<p class="credit">
+			original lab idea and code by Kevin Wallace and Jeff Prouty; revised by Brian Le, Victoria Kirst, and Marty Stepp; revised for JQuery by John Ultra
+		</p>
+
+		<p class="credit">
+		<b>Credits and Acknowledgements </b> This laboratory activity was taken from Companion Website for <cite>Web Programming
+		Step by Step</cite> by Marty Stepp, Jessica Miller, and Victoria Kirst. These materials are used in this
+		course for educational purposes only. If you are keen, the complete list of materials can be found in the following
+		URL: <a href="https://www.webstepbook.com/">https://www.webstepbook.com/</a>. The copyright to these materials
+		are owned by their respective owners. 
+		</p>
+			
+		<p>
+			The purpose of this lab is to practice programming unobtrusive JavaScript events using the Document Object Model.
+		</p>
+		
+
+		<h2>Activity 7: Interactive Mouse Maze</h2>
+
+		<p>
+			The theme of this lab is that we'll be writing a page with a simple &quot;maze&quot; that the user must navigate with the mouse.  The difficulty is not in finding the exit, because the maze is trivial, but rather in having the dexterity to move the mouse through the maze without touching any of the walls.  When the user's mouse cursor touches one of the maze walls, the walls turn red and a &quot;You lose&quot; message is shown.  Touching the Start button with the mouse will remove the red coloring from the maze walls.
+		</p>
+		
+		<div class="expectedoutput">
+			<img src="expected_output.png" alt="expected output" />
+		</div>
+
+		<p>
+			You're given files <a href="maze.html"><code>maze.html</code></a> and <a href="maze.css"><code>maze.css</code></a>.  You should download the XHTML file (right click these links and choose &quot;Save Link As...&quot;), but do not modify it.  (You shouldn't need to download the CSS file.)  You should write a script file <code>maze.js</code> in the same directory as these files that provides all event handling and behavior to make the maze work as specified below.
+		</p>
+		
+		<p>
+			The maze walls are implemented as 5 <code>div</code> elements on the page.  Our provided CSS code already positions these <code>div</code> elements into their proper places on the page, but they do nothing when you hover the mouse over them.  The relevant section of the <code>maze.html</code> code in the page's <code>body</code> that contains these elements is the following:
+		</p>
+		
+<pre>
+&lt;div id=&quot;maze&quot;&gt;
+    &lt;div id=&quot;start&quot;&gt;S&lt;/div&gt;
+    &lt;div class=&quot;boundary&quot; id=&quot;boundary1&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;boundary&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;boundary&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;boundary&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;boundary&quot;&gt;&lt;/div&gt;
+    &lt;div id=&quot;end&quot;&gt;E&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+		
+
+		<h2>Activity 7 Resources</h2>
+
+		<ul>
+			<li>
+				<a class="popup" href="https://www.webstepbook.com/supplements-2ed/slides/lectureXX-jquery.shtml">Lecture Slides</a>
+			</li>
+
+			<li>
+						Use the <b> Developer Tools </b> that are built-in in modern web browsers in debugging your work. For more info, visit the following links:
+						<a href="https://developers.google.com/web/tools/chrome-devtools"> Google Chrome</a>, and
+						<a href="https://developer.mozilla.org/en-US/docs/Tools">Mozilla Firefox</a>.
+			</li>
+
+			
+			<li>
+				<a class="popup" href="solution/maze-complete.html">Runnable solution</a> to this lab (so you can see how your page is supposed to look and work... Don't look at the source code until after lab, please!!)
+			</li>
+		</ul>
+
+		
+		<h2>Exercises for Today:</h2>
+		
+		<ol>
+			<li><a href="#ex1">Single Boundary Turns Red</a></li>
+			<li><a href="#ex2">All Boundaries Glow Red on Hover</a></li>
+			<li><a href="#ex3">Alert on Successful Completion of Maze</a></li>
+			<li><a href="#ex4">Restartable Maze</a></li>
+			<li><a href="#ex5">On-Page Status Updates</a></li>
+			<li><a href="#ex6">Disallow Cheating</a></li>
+		</ol>
+
+
+		<h2 id="ex1">Exercise 1: Single boundary turns red (roughly 15 minutes)</h2>
+
+		<p>
+			The first task is to write event-handling code so that when the user moves the mouse onto a single one of the maze's walls, that wall will turn red.  Write your JavaScript code <em>unobtrusively</em>, without modifying the <code>maze.html</code> page.  You will probably want to choose the first (top-left) wall; it is easier to access using the JQuery's <code>$()</code>, since it has an <code>id</code> attribute.  You may want to turn the wall red by setting it to have the provided CSS class <code>youlose</code>, using JQuery's <code>addClass</code> method.
+		</p>
+		
+		<p>
+			The following are more detailed suggested steps for solving this exercise:
+		</p>
+		
+		<ul>
+			<li>Write a <code>window.onload</code> handler that sets up any necessary event handlers on the page.</li>
+			<li>Handle the appropriate event on the appropriate wall by making it turn red.</li>
+		</ul>
+		
+		<p>
+			You can try our <a class="popup" href="solution/maze-boundary1.html">runnable solution</a> to this exercise to see how your page is supposed to look and work.  Don't look at the source code, please!
+		</p>
+
+
+		<h2 id="ex2">Exercise 2: All boundaries glow red on hover (roughly 10 minutes)</h2>
+
+		<p>
+			For your next task, make it so that all walls of the maze turn red when the mouse enters any one of them.  To do this, you'll need to attach an event handler to each <code>div</code> representing a wall of the maze.  It is a bit harder to select all of these <code>div</code>s, since they do not have <code>id</code> attributes.  However, they do share a common <code>class</code> of <code>boundary</code>.  You may want to look at the JQuery's <code><a href="https://api.jquery.com/each/">.each()</a></code> method.
+		</p>
+		
+		<p>
+			You may try our <a class="popup" href="solution/maze-allboundaries.html">runnable solution</a> to this exercise, to see how your page is supposed to look and work.  Don't look at the source code, please!
+		</p>
+
+		
+		<h2 id="ex3">Exercise 3: Alerts on successful completion of maze (roughly 10 minutes)</h2>
+
+		<p>
+			Your next task is to make it so that if the user reaches the end of the maze, a congratulatory &quot;You win!&quot; alert message appears.  The end of the maze is a <code>div</code> with an <code>id</code> of <code>end</code>.
+		</p>
+		
+		<p>
+			It's not very difficult to create an event handler that pops up a message when the mouse touches the ending <code>div</code>.  But note that you shouldn't pop up the &quot;You win!&quot; message unless the user makes it all the way to the end without touching any of the maze walls.  You'll need to keep track of whether the user has hit any walls or not, and examine this information when the user touches the end square.
+		</p>
+		
+		<p>
+			You may try our <a class="popup" href="solution/maze-complete.html">runnable solution</a> to this exercise (so you can see how your page is supposed to look and work... Don't look at the source code, please!)
+		</p>
+
+
+		<h2 id="ex4">Exercise 4: Restartable maze (roughly 10 minutes)</h2>
+
+		<p>
+			One annoying thing you may be noticing as you test the maze so far is that it can't easily be reset to try again.  So our next task will be to make it so that when the user <em>clicks</em> the mouse on the Start square (a <code>div</code> with an <code>id</code> of <code>start</code>), the maze state will reset.  That is, if the maze boundary walls are red, they will all return to their normal color, so that the user can try to get through the maze again.
+		</p>
+		
+		<p>
+			You may try our <a class="popup" href="solution/maze-complete.html">runnable solution</a> to this exercise (so you can see how your page is supposed to look and work... Don't look at the source code, please!)
+		</p>
+		
+
+		<h2 id="ex5">Exercise 5: On-Page status updates</h2>
+
+		<p>
+			Alert boxes are generally annoying.  Instead of an alert box, make the &quot;You win&quot; and &quot;You lose&quot; messages appear inside the page itself.  Place them into the (initially empty) <code>h2</code> element on the page with an <code>id</code> of <code>status</code>.
+		</p>
+		
+		<p>
+			You may try our <a class="popup" href="solution/maze-majors.html">runnable solution</a> to this exercise (so you can see how your page is supposed to look and work... Don't look at the source code, please!)
+		</p>
+
+
+		<h2 id="ex6">Exercise 6: Disallow cheating</h2>
+
+		<p>
+			It's currently too easy to cheat: Just move your mouse onto the start square, around the outside of the maze, and onto the end square.  Fix this by making it so that if the user moves the mouse anywhere outside the maze after clicking the Start area, the walls will light up red and the player will lose the game.
+		</p>
+		
+		<div class="w3c">
+			<a href="http://validator.w3.org/check/referer"><img src="../w3c-xhtml11.png" alt="Valid XHTML 1.1" /></a>
+			<a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="../w3c-css.png" alt="Valid CSS!" /></a>
+		</div>
+
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+
+		<script type="text/javascript">
+			var pageTracker = _gat._getTracker("UA-2729135-5");
+			pageTracker._initData();
+			pageTracker._trackPageview();
+		</script>
+	</body>
+</html>
+
